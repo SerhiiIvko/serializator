@@ -1,4 +1,7 @@
+import com.app.exception.ApplicationException;
 import org.junit.Test;
+
+import com.app.*;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -12,20 +15,20 @@ public class SerializatorTest {
 
     @Test
     public void serializeSimpleString() throws IOException {
-        String some = "Some string";
-        byte[] serialized = Serializator.serialize(some);
+        String simpleString = "Simple string";
+        byte[] serialized = Serializator.serialize(simpleString);
         assertNotNull(serialized);
+        assertTrue(serialized.length > 0);
     }
 
-    @Test
+    @Test(expected = ApplicationException.class)
     public void serializeNull() throws IOException {
-        String some = null;
-        byte[] serialized = Serializator.serialize(some);
-        assertNotNull(serialized);
+        String simpleString = null;
+        Serializator.serialize(simpleString);
     }
 
     @Test
-    public void serializeObject() throws IOException, ClassNotFoundException {
+    public void serializeObject() throws IOException {
         testObject = new TestObject();
         int age = 23;
         String name = "Bill";
@@ -43,7 +46,22 @@ public class SerializatorTest {
     }
 
     @Test
-    public void deserialize() throws IOException, ClassNotFoundException {
+    public void deserializeSimpleObject() throws IOException, ClassNotFoundException {
+        String simpleString = "Some string";
+        byte[] serialized = Serializator.serialize(simpleString);
+        String result = (String) Serializator.deserialize(serialized);
+        assertNotNull(result);
+        assertEquals(simpleString, result);
+    }
+
+    @Test(expected = ApplicationException.class)
+    public void deserializeNullObject() throws IOException, ClassNotFoundException {
+        byte[] serialized = null;
+        Serializator.deserialize(serialized);
+    }
+
+    @Test
+    public void deserializeCustomObjectWithFields() throws IOException, ClassNotFoundException {
         testObject = new TestObject();
         int age = 23;
         String name = "Bill";
